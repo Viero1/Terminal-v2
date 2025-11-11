@@ -9,7 +9,6 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="MRKT AI">
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%230f1420' width='180' height='180'/><text x='50%' y='50%' font-size='80' font-weight='bold' fill='%2300c851' text-anchor='middle' dominant-baseline='central'>M</text></svg>">
     <style>
         :root {
             --bg: #0f1420;
@@ -36,6 +35,7 @@
             user-select: none;
             -webkit-user-select: none;
             overflow: hidden;
+            height: 100vh;
         }
         
         .topbar {
@@ -43,27 +43,24 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 16px;
+            padding: 0 12px;
             background: #0b1020;
             border-bottom: 1px solid #1f2a44;
-            position: sticky;
-            top: 0;
             z-index: 100;
             flex-shrink: 0;
         }
         
         .brand {
             font-weight: 700;
-            letter-spacing: 0.4px;
-            font-size: 16px;
+            font-size: 14px;
         }
         
         .status {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--muted);
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
         }
         
         .live-dot {
@@ -77,48 +74,76 @@
             50% { opacity: 1; }
         }
         
-        .layout {
-            display: grid;
-            grid-template-columns: 1fr;
-            grid-template-rows: 1fr auto auto;
+        .main-container {
+            display: flex;
+            flex-direction: column;
             height: calc(100vh - 56px);
-            gap: 0;
-            padding: 0;
             overflow: hidden;
         }
         
-        .chart-wrap {
-            background: var(--panel);
-            border-bottom: 1px solid #1f2a44;
-            position: relative;
+        .symbol-bar {
+            height: 40px;
             display: flex;
-            flex-direction: column;
-            min-height: 0;
+            gap: 8px;
+            padding: 6px 10px;
+            background: #0b1020;
+            border-bottom: 1px solid #1f2a44;
+            overflow-x: auto;
+            overflow-y: hidden;
+            flex-shrink: 0;
         }
         
-        #chart {
+        .symbol-btn {
+            background: #151b2b;
+            color: #9aa4b2;
+            border: 1px solid #273151;
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-size: 11px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: 0.2s;
+            min-width: 60px;
+        }
+        
+        .symbol-btn.active {
+            background: var(--blue);
+            color: #fff;
+            border-color: var(--blue);
+        }
+        
+        .chart-container {
+            display: flex;
+            flex-direction: column;
             flex: 1;
-            display: block;
-            width: 100%;
-            height: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .chart-header {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 12px;
+            background: var(--panel);
+            border-bottom: 1px solid #1f2a44;
+            font-size: 12px;
+            flex-shrink: 0;
         }
         
         .tf-switch {
-            position: absolute;
-            left: 12px;
-            top: 12px;
             display: flex;
             gap: 4px;
-            z-index: 10;
         }
         
         .tf-switch button {
             background: #11172a;
             color: #cfd6e4;
             border: 1px solid #273151;
-            border-radius: 4px;
-            padding: 4px 8px;
-            font-size: 11px;
+            border-radius: 3px;
+            padding: 3px 7px;
+            font-size: 10px;
             cursor: pointer;
             transition: 0.2s;
         }
@@ -129,43 +154,60 @@
             background: rgba(35, 150, 255, 0.1);
         }
         
-        .panels-wrap {
+        .chart-canvas {
+            flex: 1;
+            background: var(--panel);
+            position: relative;
+            overflow: hidden;
+            touch-action: none;
+        }
+        
+        #chart {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .bottom-panels {
+            height: 35vh;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            gap: 6px;
             padding: 8px;
             overflow-y: auto;
-            overflow-x: hidden;
-            max-height: 40vh;
             border-top: 1px solid #1f2a44;
+            flex-shrink: 0;
         }
         
         .panel {
             background: var(--panel);
             border: 1px solid #1f2a44;
-            border-radius: 8px;
+            border-radius: 6px;
             padding: 10px;
-            font-size: 12px;
+            font-size: 11px;
+            overflow-y: auto;
         }
         
         .panel h3 {
-            margin: 0 0 8px;
-            font-size: 12px;
+            margin: 0 0 6px;
+            font-size: 11px;
             color: #cfd6e4;
         }
         
-        .panel-content {
-            font-size: 11px;
-            line-height: 1.4;
-            color: var(--muted);
+        .panel-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 3px 0;
+            font-size: 10px;
         }
         
         .zone-item {
             background: rgba(0, 200, 81, 0.1);
-            border-left: 3px solid var(--green);
-            padding: 6px;
-            margin: 4px 0;
+            border-left: 2px solid var(--green);
+            padding: 4px 6px;
+            margin: 3px 0;
             border-radius: 2px;
+            font-size: 10px;
         }
         
         .zone-item.bearish {
@@ -180,51 +222,13 @@
         
         .zone-conf {
             color: var(--yellow);
-            font-size: 10px;
-        }
-        
-        .tp-item {
-            background: rgba(35, 150, 255, 0.1);
-            padding: 4px 6px;
-            margin: 3px 0;
-            border-radius: 2px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 10px;
-        }
-        
-        .indicator-row {
-            display: flex;
-            justify-content: space-between;
-            margin: 4px 0;
-            font-size: 11px;
-        }
-        
-        .ind-label {
-            color: var(--muted);
-        }
-        
-        .ind-value {
-            color: var(--text);
-            font-weight: 600;
-        }
-        
-        .bottombar {
-            height: 36px;
-            display: flex;
-            align-items: center;
-            padding: 0 12px;
-            border-top: 1px solid #1f2a44;
-            color: var(--muted);
-            font-size: 11px;
-            background: #0b1020;
-            flex-shrink: 0;
+            font-size: 9px;
         }
         
         @media (max-width: 600px) {
-            .panels-wrap {
+            .bottom-panels {
                 grid-template-columns: 1fr;
-                max-height: 35vh;
+                height: 30vh;
             }
         }
     </style>
@@ -235,89 +239,128 @@
         <div class="status">
             <span class="live-dot">●</span>
             <span>LIVE</span>
-            <span id="price-label" style="margin-left: 12px; color: #d5def0; font-weight: 600;"></span>
+            <span id="price-label" style="margin-left: 8px; color: #d5def0; font-weight: 600;"></span>
         </div>
     </header>
 
-    <main class="layout">
-        <section class="chart-wrap">
-            <canvas id="chart"></canvas>
-            <div class="tf-switch">
-                <button data-tf="1m">1m</button>
-                <button data-tf="5m">5m</button>
-                <button data-tf="15m">15m</button>
-                <button data-tf="1h">1h</button>
-                <button data-tf="4h">4h</button>
-                <button data-tf="Daily" class="active">Daily</button>
-            </div>
-        </section>
+    <div class="main-container">
+        <!-- Symbol selector bar -->
+        <div class="symbol-bar" id="symbol-bar">
+            <!-- Buttons generated by JS -->
+        </div>
 
-        <div class="panels-wrap">
+        <!-- Chart area -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <span id="symbol-name">EURUSD</span>
+                <div class="tf-switch" id="tf-switch">
+                    <button data-tf="1m">1m</button>
+                    <button data-tf="5m">5m</button>
+                    <button data-tf="15m">15m</button>
+                    <button data-tf="1h">1h</button>
+                    <button data-tf="4h">4h</button>
+                    <button data-tf="Daily" class="active">Daily</button>
+                </div>
+            </div>
+            <div class="chart-canvas">
+                <canvas id="chart"></canvas>
+            </div>
+        </div>
+
+        <!-- Bottom analysis panels -->
+        <div class="bottom-panels">
             <div class="panel">
                 <h3>📊 Setup</h3>
-                <div class="panel-content">
-                    <div class="indicator-row">
-                        <span class="ind-label">Trend:</span>
-                        <span class="ind-value" id="setup-trend">Bullish</span>
-                    </div>
-                    <div class="indicator-row">
-                        <span class="ind-label">Strength:</span>
-                        <span class="ind-value" id="setup-strength">78%</span>
-                    </div>
-                    <div class="indicator-row">
-                        <span class="ind-label">Volatility:</span>
-                        <span class="ind-value" id="setup-vol">Medium</span>
-                    </div>
-                    <div class="indicator-row">
-                        <span class="ind-label">RSI:</span>
-                        <span class="ind-value" id="setup-rsi">58</span>
-                    </div>
+                <div class="panel-row">
+                    <span>Trend:</span>
+                    <span id="setup-trend" style="font-weight: 600;">Bullish</span>
+                </div>
+                <div class="panel-row">
+                    <span>Strength:</span>
+                    <span id="setup-strength" style="font-weight: 600;">78%</span>
+                </div>
+                <div class="panel-row">
+                    <span>Volatility:</span>
+                    <span id="setup-vol" style="font-weight: 600;">Medium</span>
+                </div>
+                <div class="panel-row">
+                    <span>RSI:</span>
+                    <span id="setup-rsi" style="font-weight: 600;">58</span>
                 </div>
             </div>
 
             <div class="panel">
                 <h3>🎯 Entry Zones</h3>
-                <div class="panel-content" id="zones-panel"></div>
+                <div id="zones-panel"></div>
             </div>
 
             <div class="panel">
                 <h3>📈 Indicators</h3>
-                <div class="panel-content">
-                    <div class="indicator-row">
-                        <span class="ind-label">MACD:</span>
-                        <span class="ind-value" id="ind-macd">Bullish</span>
-                    </div>
-                    <div class="indicator-row">
-                        <span class="ind-label">MA20:</span>
-                        <span class="ind-value" id="ind-ma20">Above</span>
-                    </div>
-                    <div class="indicator-row">
-                        <span class="ind-label">MA50:</span>
-                        <span class="ind-value" id="ind-ma50">Above</span>
-                    </div>
-                    <div class="indicator-row">
-                        <span class="ind-label">ADX:</span>
-                        <span class="ind-value" id="ind-adx">42</span>
-                    </div>
+                <div class="panel-row">
+                    <span>MACD:</span>
+                    <span id="ind-macd" style="font-weight: 600;">Bullish</span>
+                </div>
+                <div class="panel-row">
+                    <span>RSI:</span>
+                    <span id="ind-rsi" style="font-weight: 600;">58</span>
+                </div>
+                <div class="panel-row">
+                    <span>MA20:</span>
+                    <span id="ind-ma20" style="font-weight: 600;">Above</span>
+                </div>
+                <div class="panel-row">
+                    <span>ADX:</span>
+                    <span id="ind-adx" style="font-weight: 600;">42</span>
                 </div>
             </div>
 
             <div class="panel">
                 <h3>💰 TP / SL</h3>
-                <div class="panel-content" id="tpsl-panel"></div>
+                <div id="tpsl-panel"></div>
             </div>
         </div>
-    </main>
-
-    <footer class="bottombar">
-        Connected • Streaming • Next close: <span id="countdown">--:--</span>
-    </footer>
+    </div>
 
     <script>
+        // Symbols list - UPDATED dengan XAUUSD dan US500
+        const symbols = [
+            { name: 'EURUSD', price: 1.0856 },
+            { name: 'GBPUSD', price: 1.2748 },
+            { name: 'USDJPY', price: 149.50 },
+            { name: 'AUDUSD', price: 0.6580 },
+            { name: 'XAUUSD', price: 2785.50 },     // Gold - BARU
+            { name: 'US500', price: 5985.30 },       // S&P 500 - BARU
+            { name: 'AAPL', price: 238.45 },
+            { name: 'MSFT', price: 425.30 },
+            { name: 'GOOGL', price: 168.90 },
+            { name: 'TSLA', price: 291.25 },
+            { name: 'BTC', price: 98245 },
+            { name: 'ETH', price: 3520 }
+        ];
+
+        // State
+        let currentSymbol = 'EURUSD';
+        let currentTimeframe = 'Daily';
+        const state = {
+            EURUSD: { price: 1.0856, candles: [], forming: null, atr: 0.0025, trend: 'Bullish', rsi: 58 },
+            GBPUSD: { price: 1.2748, candles: [], forming: null, atr: 0.0035, trend: 'Bullish', rsi: 62 },
+            USDJPY: { price: 149.50, candles: [], forming: null, atr: 1.25, trend: 'Neutral', rsi: 52 },
+            AUDUSD: { price: 0.6580, candles: [], forming: null, atr: 0.0018, trend: 'Bearish', rsi: 42 },
+            XAUUSD: { price: 2785.50, candles: [], forming: null, atr: 15.5, trend: 'Bullish', rsi: 65 },  // Gold
+            US500: { price: 5985.30, candles: [], forming: null, atr: 85.0, trend: 'Bullish', rsi: 68 },   // S&P 500
+            AAPL: { price: 238.45, candles: [], forming: null, atr: 2.50, trend: 'Bullish', rsi: 65 },
+            MSFT: { price: 425.30, candles: [], forming: null, atr: 3.20, trend: 'Bullish', rsi: 68 },
+            GOOGL: { price: 168.90, candles: [], forming: null, atr: 1.80, trend: 'Neutral', rsi: 55 },
+            TSLA: { price: 291.25, candles: [], forming: null, atr: 4.50, trend: 'Bearish', rsi: 38 },
+            BTC: { price: 98245, candles: [], forming: null, atr: 1250, trend: 'Bullish', rsi: 71 },
+            ETH: { price: 3520, candles: [], forming: null, atr: 85, trend: 'Bullish', rsi: 64 }
+        };
+
         const canvas = document.getElementById('chart');
         const ctx = canvas.getContext('2d', { alpha: false });
-
         const DPR = Math.max(1, window.devicePixelRatio || 1);
+
+        let chartOffset = 0;
 
         function resizeCanvas() {
             const rect = canvas.getBoundingClientRect();
@@ -328,43 +371,30 @@
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
 
-        const state = {
-            timeframe: 'Daily',
-            price: 1.0856,
-            bid: 1.08558,
-            ask: 1.08562,
-            candles: [],
-            forming: null,
-            maxCandles: 90,
-            tickMs: 1000,
-            lastTick: Date.now(),
-            atr: 0.0025,
-            trend: 'Bullish',
-            volatility: 'Medium',
-            rsi: 58,
-            macd: 'Bullish'
-        };
-
-        function seedCandles() {
-            const now = Date.now();
-            let p = state.price - 0.01;
-            for (let i = 60; i >= 1; i--) {
-                const t = now - i * 60_000;
-                const o = p;
-                const h = o + (Math.random() * 0.0009);
-                const l = o - (Math.random() * 0.0009);
-                const c = l + Math.random() * (h - l);
-                const v = Math.round(1200000 * (0.8 + Math.random() * 0.4));
-                state.candles.push({ t, o, h, l, c, v });
-                p = c;
-            }
-            state.price = state.candles[state.candles.length - 1].c;
-            startNewCandle();
+        // Initialize symbols
+        function initSymbols() {
+            symbols.forEach(sym => {
+                if (!state[sym.name].candles.length) {
+                    let p = sym.price - (sym.price * 0.01);
+                    for (let i = 60; i >= 1; i--) {
+                        const t = Date.now() - i * 60_000;
+                        const o = p;
+                        const h = o + (Math.random() * state[sym.name].atr * 0.4);
+                        const l = o - (Math.random() * state[sym.name].atr * 0.4);
+                        const c = l + Math.random() * (h - l);
+                        const v = Math.round(1200000 * (0.8 + Math.random() * 0.4));
+                        state[sym.name].candles.push({ t, o, h, l, c, v });
+                        p = c;
+                    }
+                    state[sym.name].price = state[sym.name].candles[state[sym.name].candles.length - 1].c;
+                    startNewCandle(sym.name);
+                }
+            });
         }
 
-        function startNewCandle() {
+        function startNewCandle(sym) {
             const t = Date.now();
-            state.forming = { t, o: state.price, h: state.price, l: state.price, c: state.price, v: 0 };
+            state[sym].forming = { t, o: state[sym].price, h: state[sym].price, l: state[sym].price, c: state[sym].price, v: 0 };
         }
 
         function gaussian() {
@@ -374,103 +404,64 @@
             return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
         }
 
-        function volScale() {
-            return state.volatility === 'High' ? 1.8 : state.volatility === 'Low' ? 0.6 : 1.0;
-        }
-
-        function drift() {
-            return state.trend === 'Bullish' ? 1 : state.trend === 'Bearish' ? -1 : 0;
-        }
-
         function updateTick() {
-            const base = 0.00012 * volScale();
-            const move = gaussian() * base + drift() * base * 0.25;
-            state.price = Math.max(0, state.price + move);
-            state.bid = state.price - 0.0002;
-            state.ask = state.price + 0.0002;
+            symbols.forEach(sym => {
+                const s = state[sym.name];
+                const base = s.atr * 0.001;
+                const drift = s.trend === 'Bullish' ? 1 : s.trend === 'Bearish' ? -1 : 0;
+                const move = gaussian() * base + drift * base * 0.25;
+                s.price = Math.max(0, s.price + move);
 
-            const f = state.forming;
-            f.h = Math.max(f.h, state.price);
-            f.l = Math.min(f.l, state.price);
-            f.c = state.price;
-            f.v += Math.round(6000 + Math.random() * 5000);
+                const f = s.forming;
+                f.h = Math.max(f.h, s.price);
+                f.l = Math.min(f.l, s.price);
+                f.c = s.price;
+                f.v += Math.round(6000 + Math.random() * 5000);
 
-            const elapsed = Date.now() - f.t;
-            const closeMs = 60_000;
-            const remain = Math.max(0, closeMs - elapsed);
-            document.getElementById('countdown').textContent = `${String(Math.floor(remain / 1000)).padStart(2, '0')}.s`;
+                const elapsed = Date.now() - f.t;
+                if (elapsed >= 60_000) {
+                    s.candles.push(f);
+                    if (s.candles.length > 100) s.candles.shift();
+                    startNewCandle(sym.name);
+                    s.atr = 0.9 * s.atr + 0.1 * (f.h - f.l);
+                }
+            });
 
-            if (elapsed >= closeMs) {
-                state.candles.push(f);
-                if (state.candles.length > state.maxCandles) state.candles.shift();
-                startNewCandle();
-                state.atr = 0.9 * state.atr + 0.1 * (f.h - f.l);
-            }
-
-            document.getElementById('price-label').textContent = state.price.toFixed(4);
-            
+            document.getElementById('price-label').textContent = state[currentSymbol].price.toFixed(4);
             updateAnalysis();
             render();
         }
 
-        function computeRSI(period = 14) {
-            const src = [...state.candles, state.forming].map(x => x.c);
-            if (src.length < period + 1) return 50;
-            let gains = 0, losses = 0;
-            for (let i = src.length - period; i < src.length; i++) {
-                const diff = src[i] - src[i - 1];
-                if (diff > 0) gains += diff;
-                else losses += -diff;
-            }
-            const rs = gains / Math.max(1e-9, losses);
-            return 100 - (100 / (1 + rs));
-        }
-
         function updateAnalysis() {
-            state.rsi = Math.round(computeRSI());
-            document.getElementById('setup-rsi').textContent = state.rsi;
-            
-            // Random trend shift occasionally
-            if (Math.random() < 0.02) {
-                const trends = ['Bullish', 'Bearish', 'Neutral'];
-                state.trend = trends[Math.floor(Math.random() * trends.length)];
-                document.getElementById('setup-trend').textContent = state.trend;
-            }
+            const s = state[currentSymbol];
+            const rsi = s.rsi;
+            document.getElementById('setup-rsi').textContent = Math.round(rsi);
+            document.getElementById('ind-rsi').textContent = Math.round(rsi);
+            document.getElementById('setup-trend').textContent = s.trend;
+            document.getElementById('ind-macd').textContent = s.trend === 'Bullish' ? 'Bullish' : s.trend === 'Bearish' ? 'Bearish' : 'Neutral';
 
-            // Update zones
+            // Zones
             const zones = [
-                { price: 1.0842, conf: 85, type: 'bullish' },
-                { price: 1.0835, conf: 72, type: 'bullish' }
+                { price: s.price - s.atr, conf: 85, type: 'bullish' },
+                { price: s.price - s.atr * 1.5, conf: 72, type: 'bullish' }
             ];
-            const zonesHTML = zones.map(z => 
-                `<div class="zone-item ${z.type === 'bearish' ? 'bearish' : ''}">
-                    <div class="zone-price">${z.price.toFixed(4)}</div>
-                    <div class="zone-conf">Confidence: ${z.conf}%</div>
-                </div>`
-            ).join('');
+            const zonesHTML = zones.map(z => `<div class="zone-item ${z.type === 'bearish' ? 'bearish' : ''}"><div class="zone-price">${z.price.toFixed(4)}</div><div class="zone-conf">Conf: ${z.conf}%</div></div>`).join('');
             document.getElementById('zones-panel').innerHTML = zonesHTML;
 
-            // Update TP/SL
-            const entry = 1.0842;
-            const sl = 1.0825;
-            const tps = [
-                { price: 1.0875, rr: '1.9:1' },
-                { price: 1.0895, rr: '2.8:1' },
-                { price: 1.0915, rr: '3.8:1' }
-            ];
-            const tpsHTML = tps.map(tp =>
-                `<div class="tp-item">
-                    <span>${tp.price.toFixed(4)}</span>
-                    <span>${tp.rr}</span>
-                </div>`
-            ).join('');
-            document.getElementById('tpsl-panel').innerHTML = 
-                `<div style="margin-bottom: 6px;"><strong>SL:</strong> ${sl.toFixed(4)}</div>` + tpsHTML;
+            // TP/SL
+            const entry = s.price;
+            const sl = s.price - s.atr * 2;
+            const tp1 = s.price + s.atr * 1.5;
+            const tp2 = s.price + s.atr * 2.5;
+            const tp3 = s.price + s.atr * 3.5;
+            const tpsHTML = `SL: ${sl.toFixed(4)}<br>TP1: ${tp1.toFixed(4)}<br>TP2: ${tp2.toFixed(4)}<br>TP3: ${tp3.toFixed(4)}`;
+            document.getElementById('tpsl-panel').innerHTML = tpsHTML;
         }
 
         function render() {
             const W = canvas.clientWidth;
             const H = canvas.clientHeight;
+            const s = state[currentSymbol];
             
             ctx.fillStyle = '#0f1420';
             ctx.fillRect(0, 0, W, H);
@@ -479,16 +470,15 @@
             ctx.strokeStyle = 'rgba(255,255,255,0.08)';
             ctx.lineWidth = 1;
             for (let i = 0; i < 5; i++) {
-                const y = Math.round((H - 40) * i / 4) + 20;
+                const y = Math.round((H - 20) * i / 4) + 10;
                 ctx.beginPath();
                 ctx.moveTo(8, y);
                 ctx.lineTo(W - 8, y);
                 ctx.stroke();
             }
 
-            // Price range
-            const candles = [...state.candles, state.forming];
-            if (candles.length === 0) return;
+            const candles = [...s.candles, s.forming];
+            if (!candles.length) return;
 
             let minPrice = Math.min(...candles.map(c => c.l));
             let maxPrice = Math.max(...candles.map(c => c.h));
@@ -496,18 +486,20 @@
             minPrice -= range * 0.05;
             maxPrice += range * 0.05;
 
-            const chartHeight = H - 40;
+            const chartHeight = H - 20;
             const chartWidth = W - 16;
-            const candleWidth = Math.max(2, Math.floor(chartWidth / candles.length * 0.8));
-            const spacing = Math.ceil(chartWidth / candles.length);
+            const numVisible = Math.min(50, candles.length);
+            const candleWidth = Math.max(2, Math.floor(chartWidth / numVisible * 0.7));
+            const spacing = Math.ceil(chartWidth / numVisible);
 
-            // Draw candles
-            candles.forEach((candle, i) => {
-                const x = 8 + i * spacing + spacing / 2;
-                const openY = 20 + chartHeight * (1 - (candle.o - minPrice) / (maxPrice - minPrice));
-                const highY = 20 + chartHeight * (1 - (candle.h - minPrice) / (maxPrice - minPrice));
-                const lowY = 20 + chartHeight * (1 - (candle.l - minPrice) / (maxPrice - minPrice));
-                const closeY = 20 + chartHeight * (1 - (candle.c - minPrice) / (maxPrice - minPrice));
+            candles.slice(-numVisible).forEach((candle, i) => {
+                const x = 8 + (i + (candles.length - numVisible)) * spacing + spacing / 2;
+                if (x < 8 || x > W - 8) return;
+
+                const openY = 10 + chartHeight * (1 - (candle.o - minPrice) / (maxPrice - minPrice));
+                const highY = 10 + chartHeight * (1 - (candle.h - minPrice) / (maxPrice - minPrice));
+                const lowY = 10 + chartHeight * (1 - (candle.l - minPrice) / (maxPrice - minPrice));
+                const closeY = 10 + chartHeight * (1 - (candle.c - minPrice) / (maxPrice - minPrice));
 
                 const color = candle.c >= candle.o ? '#00c851' : '#ff4444';
 
@@ -527,7 +519,7 @@
             });
 
             // Current price line
-            const priceLine = 20 + chartHeight * (1 - (state.price - minPrice) / (maxPrice - minPrice));
+            const priceLine = 10 + chartHeight * (1 - (s.price - minPrice) / (maxPrice - minPrice));
             ctx.strokeStyle = 'rgba(35, 150, 255, 0.5)';
             ctx.lineWidth = 1;
             ctx.setLineDash([4, 4]);
@@ -538,20 +530,61 @@
             ctx.setLineDash([]);
         }
 
+        // Symbol buttons
+        function createSymbolButtons() {
+            const bar = document.getElementById('symbol-bar');
+            symbols.forEach(sym => {
+                const btn = document.createElement('button');
+                btn.className = `symbol-btn ${sym.name === currentSymbol ? 'active' : ''}`;
+                btn.textContent = sym.name;
+                btn.onclick = () => switchSymbol(sym.name);
+                bar.appendChild(btn);
+            });
+        }
+
+        function switchSymbol(sym) {
+            currentSymbol = sym;
+            document.getElementById('symbol-name').textContent = sym;
+            document.querySelectorAll('.symbol-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', btn.textContent === sym);
+            });
+            updateAnalysis();
+            render();
+        }
+
         // Timeframe buttons
         document.querySelectorAll('.tf-switch button').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.tf-switch button').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                state.timeframe = btn.dataset.tf;
+                currentTimeframe = btn.dataset.tf;
+                render();
             });
         });
 
-        seedCandles();
+        // Touch scroll untuk chart
+        let touchStartX = 0;
+        canvas.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+        });
+
+        canvas.addEventListener('touchmove', (e) => {
+            const touchX = e.touches[0].clientX;
+            const diff = touchX - touchStartX;
+            if (Math.abs(diff) > 5) {
+                chartOffset += diff;
+                touchStartX = touchX;
+                render();
+            }
+        });
+
+        // Init
+        initSymbols();
+        createSymbolButtons();
         updateAnalysis();
         render();
 
-        setInterval(updateTick, state.tickMs);
+        setInterval(updateTick, 1000);
     </script>
 </body>
 </html>
