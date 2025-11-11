@@ -431,10 +431,10 @@
             <div class="top-bar">
                 <div class="symbol-info">
                     <div class="symbol-name" id="symbol-name">EURUSD</div>
-                    <div class="symbol-price" id="symbol-price">1.0856</div>
+                    <div class="symbol-price" id="symbol-price">--</div>
                 </div>
                 <div class="timeframes" id="tf-container"></div>
-                <div class="status" id="status">Loading...</div>
+                <div class="status" id="status">Ready</div>
             </div>
             
             <!-- Chart -->
@@ -501,9 +501,23 @@
             { label: 'D', value: 1440 }
         ];
         
-        const tfResolution = {
-            1: '1', 5: '5', 15: '15', 60: '60', 240: '60', 1440: 'D'
-        };
+        // ===== HELPER FUNCTIONS =====
+        function symbolToOanda(sym) {
+            // EURUSD -> OANDA:EUR_USD, XAUUSD -> OANDA:XAU_USD, US500 -> US500
+            if (sym === 'US500' || sym === 'US100' || sym === 'US30') {
+                return sym; // indices tidak pakai OANDA prefix di Finnhub
+            }
+            const base = sym.slice(0, 3);
+            const quote = sym.slice(3);
+            return `OANDA:${base}_${quote}`;
+        }
+        
+        function resolutionMap(tf) {
+            // 240 (4h) -> 60 (1h) untuk sementara karena Finnhub tidak punya native 4h
+            if (tf === 240) return '60';
+            if (tf === 1440) return 'D';
+            return String(tf);
+        }
         
         // ===== STATE =====
         let currentSymbol = 'EURUSD';
@@ -541,8 +555,6 @@
                     horzLines: { color: 'rgba(255,255,255,0.08)' },
                     vertLines: { color: 'rgba(255,255,255,0.08)' },
                 },
-                rightPriceScale: { textColor: '#9aa4b2' },
-                timeScale: { textColor: '#9aa4b2' }
             });
             
             candleSeries = chart.addCandlestickSeries({
@@ -575,10 +587,10 @@
         
         function switchTimeframe(tf) {
             currentTF = tf;
-            document.querySelectorAll('.tf-btn').forEach(b => 
-                b.classList.toggle('active', b.textContent === 
-                    timeframes.find(x => x.value === tf).label)
-            );
+            document.querySelectorAll('.tf-btn').forEach(b => {
+                const tfLabel = timeframes.find(x => x.value === tf);
+                b.classList.toggle('active', b.textContent === tfLabel.label);
+            });
             loadChartData();
         }
         
@@ -637,25 +649,35 @@
         
         async function loadChartData() {
             if (!apiKey) {
-                document.getElementById('status').textContent = 'API Key needed';
+                document.getElementById('status').textContent = '❌ API Key needed';
                 return;
             }
             
-            const res = tfResolution[currentTF] || 'D';
+            const oandaSymbol = symbolToOanda(currentSymbol);
+            const res = resolutionMap(currentTF);
             const now = Math.floor(Date.now() / 1000);
-            const bars = 500;
-            const secs = res === 'D' ? 86400 : parseInt(res) * 60;
-            const from = now - bars * secs;
             
-            const url = `https://finnhub.io/api/v1/forex/candle?symbol=OANDA:${currentSymbol}&resolution=${res}&from=${from}&to=${now}&token=${apiKey}`;
+            let from;
+            if (res === 'D') {
+                // 3 tahun ke belakang untuk daily
+                from = now - (365 * 3 * 86400);
+            } else {
+                // untuk intraday, ambil 1500 bar ke belakang
+                from = now - (1500 * parseInt(res) * 60);
+            }
+            
+            const url = `https://finnhub.io/api/v1/forex/candle?symbol=${oandaSymbol}&resolution=${res}&from=${from}&to=${now}&token=${apiKey}`;
             
             document.getElementById('status').textContent = '⏳ Loading...';
             
             try {
-                const r = await fetch(url);
-                const data = await r.json();
+                const response = await fetch(url);
+                const data = await response.json();
                 
-                if (data.s !== 'ok' || !data.c) throw new Error('No data');
+                if (data.s !== 'ok' || !data.c || data.c.length === 0) {
+                    document.getElementById('status').textContent = '❌ No data for ' + currentSymbol;
+                    return;
+                }
                 
                 const candles = data.c.map((c, i) => ({
                     time: data.t[i],
@@ -665,11 +687,12 @@
                     close: data.c[i],
                 }));
                 
-                const range = chart.timeScale().getVisibleLogicalRange();
+                // Jaga range chart agar tidak loncat
+                const currentRange = chart.timeScale().getVisibleLogicalRange();
                 candleSeries.setData(candles);
                 
-                if (range && isFinite(range.from) && isFinite(range.to)) {
-                    chart.timeScale().setVisibleLogicalRange(range);
+                if (currentRange && isFinite(currentRange.from) && isFinite(currentRange.to)) {
+                    chart.timeScale().setVisibleLogicalRange(currentRange);
                 } else {
                     chart.timeScale().fitContent();
                 }
@@ -682,6 +705,7 @@
                 
             } catch (error) {
                 document.getElementById('status').textContent = '❌ ' + error.message;
+                console.error('Fetch error:', error);
             }
         }
         
@@ -691,9 +715,10 @@
             
             document.getElementById('symbol-price').textContent = last.close.toFixed(5);
             document.getElementById('bar-high').textContent = Math.max(...candles.map(c => c.high)).toFixed(5);
-            document.getElementById('bar-low').textContent = Math.min(...candles.map(c => c.l)).toFixed(5);
-            document.getElementById('bar-change').textContent = 
-                ((last.close - first.open) / first.open * 100).toFixed(2) + '%';
+            document.getElementById('bar-low').textContent = Math.min(...candles.map(c => c.low)).toFixed(5);
+            
+            const change = ((last.close - first.open) / first.open * 100).toFixed(2);
+            document.getElementById('bar-change').textContent = change + '%';
             document.getElementById('bar-time').textContent = new Date().toLocaleTimeString();
         }
         
@@ -708,12 +733,12 @@
                 trs.push(tr);
             }
             const slice = trs.slice(-n);
-            return slice.reduce((a, b) => a + b, 0) / n;
+            return slice.reduce((a, b) => a + b, 0) / Math.max(1, slice.length);
         }
         
         function calcMA(candles, n = 20) {
             const closes = candles.slice(-n).map(c => c.close);
-            return closes.reduce((a, b) => a + b, 0) / n;
+            return closes.reduce((a, b) => a + b, 0) / Math.max(1, closes.length);
         }
         
         function drawProjections(candles) {
