@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>MRKT AI - Price Projections Terminal</title>
+    <title>MRKT CFD - Pro Trading Terminal</title>
     <meta name="theme-color" content="#0f1420">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
     
-    <!-- TradingView Lightweight Charts -->
     <script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
     
     <style>
@@ -48,7 +47,7 @@
         }
         
         .sidebar {
-            width: 300px;
+            width: 320px;
             background: #0b1020;
             border-right: 1px solid #1f2a44;
             display: flex;
@@ -58,10 +57,77 @@
         }
         
         .sidebar-header {
-            padding: 16px;
+            padding: 14px;
             border-bottom: 1px solid #1f2a44;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 13px;
+            color: var(--blue);
+        }
+        
+        .search-section {
+            padding: 12px;
+            border-bottom: 1px solid #1f2a44;
+        }
+        
+        .search-box {
+            position: relative;
+            width: 100%;
+        }
+        
+        .search-box input {
+            width: 100%;
+            background: #151b2b;
+            border: 1px solid #273151;
+            border-radius: 4px;
+            padding: 8px 10px;
+            color: var(--text);
+            font-size: 12px;
+        }
+        
+        .search-box input::placeholder {
+            color: var(--muted);
+        }
+        
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #151b2b;
+            border: 1px solid #273151;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+        
+        .search-results.active {
+            display: block;
+        }
+        
+        .search-result-item {
+            padding: 8px 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #0f1420;
+            font-size: 11px;
+            transition: 0.1s;
+        }
+        
+        .search-result-item:hover {
+            background: var(--blue);
+            color: white;
+        }
+        
+        .result-symbol {
+            font-weight: 600;
+            color: var(--blue);
+        }
+        
+        .result-description {
+            font-size: 10px;
+            color: var(--muted);
         }
         
         .api-section {
@@ -69,7 +135,15 @@
             border-bottom: 1px solid #1f2a44;
         }
         
-        .api-section input {
+        .api-label {
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            display: block;
+        }
+        
+        .api-input {
             width: 100%;
             background: #151b2b;
             border: 1px solid #273151;
@@ -77,10 +151,10 @@
             padding: 6px 10px;
             color: var(--text);
             font-size: 11px;
-            margin: 4px 0;
+            margin-bottom: 4px;
         }
         
-        .api-section button {
+        .api-btn {
             width: 100%;
             background: var(--blue);
             color: white;
@@ -89,77 +163,56 @@
             padding: 6px;
             font-size: 11px;
             cursor: pointer;
+            transition: 0.2s;
+        }
+        
+        .api-btn:hover {
+            background: #1a7fd9;
+        }
+        
+        .bias-section {
+            padding: 12px;
+            border-bottom: 1px solid #1f2a44;
+            font-size: 11px;
+        }
+        
+        .bias-title {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+        
+        .bias-row {
+            display: flex;
+            justify-content: space-between;
             margin: 4px 0;
         }
         
-        .symbols-section {
-            padding: 12px;
-            border-bottom: 1px solid #1f2a44;
-        }
-        
-        .symbols-title {
-            font-size: 11px;
+        .bias-label {
             color: var(--muted);
-            margin-bottom: 8px;
-            text-transform: uppercase;
         }
         
-        .symbol-list {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        
-        .symbol-item {
-            background: #151b2b;
-            border: 1px solid #273151;
-            border-radius: 4px;
-            padding: 8px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: 0.2s;
-        }
-        
-        .symbol-item:hover,
-        .symbol-item.active {
-            background: var(--blue);
-            border-color: var(--blue);
-            color: white;
-        }
-        
-        .timeframes-section {
-            padding: 12px;
-            border-bottom: 1px solid #1f2a44;
-        }
-        
-        .tf-title {
-            font-size: 11px;
-            color: var(--muted);
-            margin-bottom: 8px;
-            text-transform: uppercase;
-        }
-        
-        .tf-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4px;
-        }
-        
-        .tf-btn {
-            background: #151b2b;
-            border: 1px solid #273151;
-            border-radius: 4px;
-            padding: 6px;
-            cursor: pointer;
+        .bias-value {
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 2px;
             font-size: 10px;
-            color: var(--muted);
-            transition: 0.2s;
         }
         
-        .tf-btn.active {
-            background: var(--blue);
-            border-color: var(--blue);
-            color: white;
+        .bias-value.bullish {
+            background: rgba(0, 200, 81, 0.2);
+            color: var(--green);
+        }
+        
+        .bias-value.bearish {
+            background: rgba(255, 68, 68, 0.2);
+            color: var(--red);
+        }
+        
+        .bias-value.neutral {
+            background: rgba(255, 170, 0, 0.2);
+            color: var(--yellow);
         }
         
         .projections-section {
@@ -169,45 +222,45 @@
             overflow-y: auto;
         }
         
-        .projection-title {
-            font-size: 11px;
+        .proj-title {
+            font-size: 10px;
+            text-transform: uppercase;
             color: var(--muted);
             margin-bottom: 8px;
-            text-transform: uppercase;
         }
         
-        .projection-item {
+        .proj-item {
             background: rgba(0, 200, 81, 0.1);
             border-left: 3px solid var(--green);
             padding: 8px;
             margin: 6px 0;
-            border-radius: 4px;
-            font-size: 11px;
+            border-radius: 3px;
+            font-size: 10px;
         }
         
-        .projection-item.bearish {
+        .proj-item.bearish {
             background: rgba(255, 68, 68, 0.1);
             border-left-color: var(--red);
         }
         
-        .projection-item.pullback {
+        .proj-item.pullback {
             background: rgba(255, 170, 0, 0.1);
             border-left-color: var(--yellow);
         }
         
-        .projection-label {
-            font-size: 10px;
+        .proj-label {
             color: var(--muted);
+            font-size: 9px;
         }
         
-        .projection-price {
+        .proj-price {
             font-weight: 700;
             color: var(--text);
             font-size: 12px;
-            margin: 4px 0;
+            margin: 3px 0;
         }
         
-        .projection-reason {
+        .proj-reason {
             font-size: 9px;
             color: var(--muted);
             line-height: 1.3;
@@ -221,13 +274,18 @@
         }
         
         .top-bar {
-            height: 48px;
+            height: 50px;
             background: #0b1020;
             border-bottom: 1px solid #1f2a44;
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 16px;
+            gap: 20px;
+        }
+        
+        .symbol-info {
+            flex: 1;
         }
         
         .symbol-name {
@@ -235,63 +293,88 @@
             font-size: 16px;
         }
         
-        .current-price {
-            font-size: 14px;
+        .symbol-price {
+            font-size: 12px;
             color: var(--green);
         }
         
-        .chart-area {
+        .timeframes {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .tf-btn {
+            background: #151b2b;
+            border: 1px solid #273151;
+            border-radius: 3px;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 10px;
+            color: var(--muted);
+            transition: 0.2s;
+        }
+        
+        .tf-btn.active {
+            background: var(--blue);
+            border-color: var(--blue);
+            color: white;
+        }
+        
+        .status {
+            font-size: 11px;
+            color: var(--muted);
+        }
+        
+        .chart-container {
             flex: 1;
             overflow: hidden;
             background: var(--panel);
-            position: relative;
         }
         
-        #tradingview-chart {
+        #chart {
             width: 100%;
             height: 100%;
         }
         
-        .info-bar {
-            height: 40px;
+        .bottom-bar {
+            height: 36px;
             background: #0b1020;
             border-top: 1px solid #1f2a44;
             display: flex;
             gap: 16px;
             padding: 0 16px;
             align-items: center;
-            font-size: 11px;
+            font-size: 10px;
             overflow-x: auto;
-            overflow-y: hidden;
         }
         
-        .info-item {
+        .bar-item {
             white-space: nowrap;
         }
         
-        .info-label {
+        .bar-label {
             color: var(--muted);
         }
         
-        .info-value {
+        .bar-value {
             color: var(--text);
             font-weight: 600;
         }
         
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
             .layout {
                 flex-direction: column;
             }
             
             .sidebar {
                 width: 100%;
-                height: 35vh;
+                height: 40vh;
                 border-right: none;
                 border-bottom: 1px solid #1f2a44;
             }
             
             .main-area {
-                height: 65vh;
+                height: 60vh;
             }
         }
     </style>
@@ -300,113 +383,151 @@
     <div class="layout">
         <!-- Sidebar -->
         <div class="sidebar">
-            <div class="sidebar-header">MRKT AI Terminal</div>
+            <div class="sidebar-header">🎯 MRKT CFD Terminal</div>
             
+            <!-- Search Symbol -->
+            <div class="search-section">
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="Search symbol... (EURUSD, XAUUSD, US500)">
+                    <div class="search-results" id="search-results"></div>
+                </div>
+            </div>
+            
+            <!-- API Key -->
             <div class="api-section">
-                <div style="font-size: 11px; color: var(--muted); margin-bottom: 6px;">EODHD API Key</div>
-                <input type="password" id="api-key-input" placeholder="Paste API key" value="">
-                <button onclick="saveApiKey()">Save & Connect</button>
+                <label class="api-label">Finnhub API Key</label>
+                <input type="password" id="api-key" class="api-input" placeholder="Paste API key">
+                <button class="api-btn" onclick="saveApiKey()">Connect</button>
                 <div id="api-status" style="font-size: 10px; margin-top: 4px;"></div>
             </div>
             
-            <div class="symbols-section">
-                <div class="symbols-title">📊 Symbols</div>
-                <div class="symbol-list" id="symbol-list"></div>
+            <!-- Bias Analysis -->
+            <div class="bias-section">
+                <div class="bias-title">📊 Market Bias</div>
+                <div class="bias-row">
+                    <span class="bias-label">Higher TF:</span>
+                    <span class="bias-value bullish" id="bias-htf">Analyzing...</span>
+                </div>
+                <div class="bias-row">
+                    <span class="bias-label">Intraday:</span>
+                    <span class="bias-value bullish" id="bias-itd">Analyzing...</span>
+                </div>
+                <div class="bias-row">
+                    <span class="bias-label">Strength:</span>
+                    <span class="bias-value" id="bias-strength">68%</span>
+                </div>
             </div>
             
-            <div class="timeframes-section">
-                <div class="tf-title">⏱️ Timeframe</div>
-                <div class="tf-buttons" id="tf-buttons"></div>
-            </div>
-            
+            <!-- Price Projections -->
             <div class="projections-section">
-                <div class="projection-title">🎯 Price Projections</div>
+                <div class="proj-title">🎯 Price Projections</div>
                 <div id="projections-list"></div>
             </div>
         </div>
         
         <!-- Main Area -->
         <div class="main-area">
+            <!-- Top Bar -->
             <div class="top-bar">
-                <div>
+                <div class="symbol-info">
                     <div class="symbol-name" id="symbol-name">EURUSD</div>
-                    <div class="current-price" id="current-price">0.0000</div>
+                    <div class="symbol-price" id="symbol-price">1.0856</div>
                 </div>
-                <div id="status-info" style="font-size: 11px; color: var(--muted);">Waiting for API...</div>
+                <div class="timeframes" id="tf-container"></div>
+                <div class="status" id="status">Loading...</div>
             </div>
             
-            <div class="chart-area">
-                <div id="tradingview-chart"></div>
+            <!-- Chart -->
+            <div class="chart-container">
+                <div id="chart"></div>
             </div>
             
-            <div class="info-bar">
-                <div class="info-item">
-                    <span class="info-label">High: </span>
-                    <span class="info-value" id="day-high">--</span>
+            <!-- Bottom Bar -->
+            <div class="bottom-bar">
+                <div class="bar-item">
+                    <span class="bar-label">High:</span>
+                    <span class="bar-value" id="bar-high">--</span>
                 </div>
-                <div class="info-item">
-                    <span class="info-label">Low: </span>
-                    <span class="info-value" id="day-low">--</span>
+                <div class="bar-item">
+                    <span class="bar-label">Low:</span>
+                    <span class="bar-value" id="bar-low">--</span>
                 </div>
-                <div class="info-item">
-                    <span class="info-label">Change: </span>
-                    <span class="info-value" id="change">--</span>
+                <div class="bar-item">
+                    <span class="bar-label">Change:</span>
+                    <span class="bar-value" id="bar-change">--</span>
                 </div>
-                <div class="info-item">
-                    <span class="info-label">Last Update: </span>
-                    <span class="info-value" id="last-update">--</span>
+                <div class="bar-item">
+                    <span class="bar-label">Last Update:</span>
+                    <span class="bar-value" id="bar-time">--</span>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Symbols & EODHD mapping
-        const symbols = [
-            { name: 'EURUSD', eodhd: 'EURUSD.FOREX' },
-            { name: 'GBPUSD', eodhd: 'GBPUSD.FOREX' },
-            { name: 'USDJPY', eodhd: 'USDJPY.FOREX' },
-            { name: 'AUDUSD', eodhd: 'AUDUSD.FOREX' },
-            { name: 'XAUUSD', eodhd: 'XAUUSD.COMMODITY' },
-            { name: 'US500', eodhd: 'INDU.INDX' },
-            { name: 'AAPL', eodhd: 'AAPL.US' },
-            { name: 'MSFT', eodhd: 'MSFT.US' },
-            { name: 'GOOGL', eodhd: 'GOOGL.US' },
-            { name: 'TSLA', eodhd: 'TSLA.US' },
-            { name: 'BTC', eodhd: 'BTC.CC' },
-            { name: 'ETH', eodhd: 'ETH.CC' }
+        // ===== CONFIG =====
+        const forexSymbols = [
+            { symbol: 'EURUSD', name: 'EUR/USD', exchange: 'FOREX' },
+            { symbol: 'GBPUSD', name: 'GBP/USD', exchange: 'FOREX' },
+            { symbol: 'USDJPY', name: 'USD/JPY', exchange: 'FOREX' },
+            { symbol: 'AUDUSD', name: 'AUD/USD', exchange: 'FOREX' },
+            { symbol: 'NZDUSD', name: 'NZD/USD', exchange: 'FOREX' },
+            { symbol: 'USDCAD', name: 'USD/CAD', exchange: 'FOREX' },
+            { symbol: 'USDCHF', name: 'USD/CHF', exchange: 'FOREX' },
+            { symbol: 'EURGBP', name: 'EUR/GBP', exchange: 'FOREX' },
+            { symbol: 'EURJPY', name: 'EUR/JPY', exchange: 'FOREX' },
+            { symbol: 'GBPJPY', name: 'GBP/JPY', exchange: 'FOREX' },
         ];
+        
+        const commoditiesSymbols = [
+            { symbol: 'XAUUSD', name: 'Gold (XAU)', exchange: 'COMMODITY' },
+            { symbol: 'XAGUSD', name: 'Silver (XAG)', exchange: 'COMMODITY' },
+        ];
+        
+        const indicesSymbols = [
+            { symbol: 'US500', name: 'S&P 500', exchange: 'INDEX' },
+            { symbol: 'US100', name: 'Nasdaq 100', exchange: 'INDEX' },
+            { symbol: 'US30', name: 'Dow Jones', exchange: 'INDEX' },
+        ];
+        
+        const allSymbols = [...forexSymbols, ...commoditiesSymbols, ...indicesSymbols];
         
         const timeframes = [
-            { label: '1m', value: '1' },
-            { label: '5m', value: '5' },
-            { label: '15m', value: '15' },
-            { label: '1h', value: '60' },
-            { label: '4h', value: '240' },
-            { label: 'Daily', value: '1440' }
+            { label: '1m', value: 1 },
+            { label: '5m', value: 5 },
+            { label: '15m', value: 15 },
+            { label: '1h', value: 60 },
+            { label: '4h', value: 240 },
+            { label: 'D', value: 1440 }
         ];
         
+        const tfResolution = {
+            1: '1', 5: '5', 15: '15', 60: '60', 240: '60', 1440: 'D'
+        };
+        
+        // ===== STATE =====
         let currentSymbol = 'EURUSD';
-        let currentTimeframe = '1440';
-        let apiKey = localStorage.getItem('eodhd-api-key') || '';
+        let currentTF = 1440;
+        let apiKey = localStorage.getItem('finnhub-api-key') || '';
         let chart = null;
         let candleSeries = null;
-
-        // Initialize
+        let priceLines = [];
+        
+        // ===== INIT =====
         function init() {
-            initChart();
-            createSymbolButtons();
-            createTimeframeButtons();
-            
             if (apiKey) {
-                document.getElementById('api-key-input').value = apiKey;
+                document.getElementById('api-key').value = apiKey;
                 document.getElementById('api-status').innerHTML = '<span style="color: var(--green);">✓ Loaded</span>';
-                setTimeout(loadChartData, 500);
             }
+            
+            initChart();
+            createTimeframeButtons();
+            setupSearch();
+            loadChartData();
         }
-
+        
         function initChart() {
-            const container = document.getElementById('tradingview-chart');
+            const container = document.getElementById('chart');
             chart = LightweightCharts.createChart(container, {
                 layout: {
                     background: { color: '#0f1420' },
@@ -415,20 +536,15 @@
                 timeScale: {
                     timeVisible: true,
                     secondsVisible: false,
-                    barSpacing: 20,
                 },
                 grid: {
-                    horzLines: { color: 'rgba(255, 255, 255, 0.1)' },
-                    vertLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                    horzLines: { color: 'rgba(255,255,255,0.08)' },
+                    vertLines: { color: 'rgba(255,255,255,0.08)' },
                 },
-                rightPriceScale: {
-                    textColor: '#9aa4b2',
-                },
-                timeScale: {
-                    textColor: '#9aa4b2',
-                }
+                rightPriceScale: { textColor: '#9aa4b2' },
+                timeScale: { textColor: '#9aa4b2' }
             });
-
+            
             candleSeries = chart.addCandlestickSeries({
                 upColor: '#00c851',
                 downColor: '#ff4444',
@@ -436,165 +552,241 @@
                 wickDownColor: '#ff4444',
                 borderVisible: true,
             });
-
+            
             chart.timeScale().fitContent();
             window.addEventListener('resize', () => {
-                if (chart) chart.applyOptions({ 
-                    width: container.clientWidth, 
-                    height: container.clientHeight 
+                if (chart) chart.applyOptions({
+                    width: container.clientWidth,
+                    height: container.clientHeight
                 });
             });
         }
-
-        function createSymbolButtons() {
-            const list = document.getElementById('symbol-list');
-            symbols.forEach(sym => {
-                const btn = document.createElement('div');
-                btn.className = `symbol-item ${sym.name === currentSymbol ? 'active' : ''}`;
-                btn.textContent = sym.name;
-                btn.onclick = () => switchSymbol(sym.name);
-                list.appendChild(btn);
-            });
-        }
-
+        
         function createTimeframeButtons() {
-            const container = document.getElementById('tf-buttons');
+            const container = document.getElementById('tf-container');
             timeframes.forEach(tf => {
                 const btn = document.createElement('button');
-                btn.className = `tf-btn ${tf.value === currentTimeframe ? 'active' : ''}`;
+                btn.className = `tf-btn ${tf.value === currentTF ? 'active' : ''}`;
                 btn.textContent = tf.label;
-                btn.dataset.tf = tf.value;
                 btn.onclick = () => switchTimeframe(tf.value);
                 container.appendChild(btn);
             });
         }
-
-        function switchSymbol(sym) {
-            currentSymbol = sym;
-            document.getElementById('symbol-name').textContent = sym;
-            document.querySelectorAll('.symbol-item').forEach(btn => {
-                btn.classList.toggle('active', btn.textContent === sym);
-            });
-            loadChartData();
-        }
-
+        
         function switchTimeframe(tf) {
-            currentTimeframe = tf;
-            document.querySelectorAll('.tf-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.tf === tf);
-            });
+            currentTF = tf;
+            document.querySelectorAll('.tf-btn').forEach(b => 
+                b.classList.toggle('active', b.textContent === 
+                    timeframes.find(x => x.value === tf).label)
+            );
             loadChartData();
         }
-
+        
+        function setupSearch() {
+            const input = document.getElementById('search-input');
+            const results = document.getElementById('search-results');
+            
+            input.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                
+                if (!query) {
+                    results.classList.remove('active');
+                    return;
+                }
+                
+                const filtered = allSymbols.filter(s => 
+                    s.symbol.toLowerCase().includes(query) ||
+                    s.name.toLowerCase().includes(query)
+                );
+                
+                results.innerHTML = filtered.map(s => `
+                    <div class="search-result-item" onclick="selectSymbol('${s.symbol}')">
+                        <div class="result-symbol">${s.symbol}</div>
+                        <div class="result-description">${s.name} • ${s.exchange}</div>
+                    </div>
+                `).join('');
+                
+                results.classList.toggle('active', filtered.length > 0);
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.search-box')) {
+                    results.classList.remove('active');
+                }
+            });
+        }
+        
+        function selectSymbol(sym) {
+            currentSymbol = sym;
+            document.getElementById('search-input').value = '';
+            document.getElementById('search-results').classList.remove('active');
+            document.getElementById('symbol-name').textContent = sym;
+            loadChartData();
+        }
+        
         function saveApiKey() {
-            apiKey = document.getElementById('api-key-input').value.trim();
+            apiKey = document.getElementById('api-key').value.trim();
             if (!apiKey) {
-                document.getElementById('api-status').innerHTML = '<span style="color: var(--red);">❌ Key kosong</span>';
+                document.getElementById('api-status').innerHTML = '<span style="color: var(--red);">❌ Empty</span>';
                 return;
             }
-            localStorage.setItem('eodhd-api-key', apiKey);
+            localStorage.setItem('finnhub-api-key', apiKey);
             document.getElementById('api-status').innerHTML = '<span style="color: var(--green);">✓ Saved</span>';
             loadChartData();
         }
-
+        
         async function loadChartData() {
             if (!apiKey) {
-                document.getElementById('status-info').textContent = '❌ Masukkan API Key';
+                document.getElementById('status').textContent = 'API Key needed';
                 return;
             }
-
-            const sym = symbols.find(s => s.name === currentSymbol);
-            const url = `https://eodhd.com/api/eod/${sym.eodhd}?api_token=${apiKey}&period=${currentTimeframe}&fmt=json`;
-
-            document.getElementById('status-info').textContent = '⏳ Loading...';
-
+            
+            const res = tfResolution[currentTF] || 'D';
+            const now = Math.floor(Date.now() / 1000);
+            const bars = 500;
+            const secs = res === 'D' ? 86400 : parseInt(res) * 60;
+            const from = now - bars * secs;
+            
+            const url = `https://finnhub.io/api/v1/forex/candle?symbol=OANDA:${currentSymbol}&resolution=${res}&from=${from}&to=${now}&token=${apiKey}`;
+            
+            document.getElementById('status').textContent = '⏳ Loading...';
+            
             try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const r = await fetch(url);
+                const data = await r.json();
                 
-                const data = await response.json();
-                if (!data || data.length === 0) throw new Error('No data');
-
-                const candles = data.map(d => ({
-                    time: Math.floor(new Date(d.date).getTime() / 1000),
-                    open: d.open,
-                    high: d.high,
-                    low: d.low,
-                    close: d.close,
+                if (data.s !== 'ok' || !data.c) throw new Error('No data');
+                
+                const candles = data.c.map((c, i) => ({
+                    time: data.t[i],
+                    open: data.o[i],
+                    high: data.h[i],
+                    low: data.l[i],
+                    close: data.c[i],
                 }));
-
-                candleSeries.setData(candles);
-                chart.timeScale().fitContent();
-
-                // Update info
-                const latest = data[data.length - 1];
-                document.getElementById('current-price').textContent = latest.close.toFixed(4);
-                document.getElementById('day-high').textContent = latest.high.toFixed(4);
-                document.getElementById('day-low').textContent = latest.low.toFixed(4);
                 
-                const change = ((latest.close - data[0].open) / data[0].open * 100).toFixed(2);
-                document.getElementById('change').textContent = `${change}%`;
-                document.getElementById('last-update').textContent = new Date().toLocaleTimeString();
-                document.getElementById('status-info').textContent = '✓ Live (EODHD)';
-
-                // Generate projections
-                generateProjections(data);
-
-            } catch (error) {
-                document.getElementById('status-info').textContent = `❌ ${error.message}`;
-            }
-        }
-
-        function generateProjections(data) {
-            const latest = data[data.length - 1];
-            const prevClose = data[0].close;
-            const atr = calculateATR(data);
-            const trend = latest.close > prevClose ? 'bullish' : 'bearish';
-
-            const projections = [
-                {
-                    label: 'Bullish Target',
-                    price: (latest.close + atr * 1.5).toFixed(4),
-                    type: 'bullish',
-                    reasons: ['Strong momentum', 'Above MA50', 'MACD positive']
-                },
-                {
-                    label: 'Pullback Level',
-                    price: (latest.close - atr * 0.5).toFixed(4),
-                    type: 'pullback',
-                    reasons: ['Support zone', 'Previous bounce', 'Fibonacci level']
-                },
-                {
-                    label: 'Bearish Target',
-                    price: (latest.close - atr * 2).toFixed(4),
-                    type: 'bearish',
-                    reasons: ['If breaks support', 'Resistance rejection', 'Economic data']
+                const range = chart.timeScale().getVisibleLogicalRange();
+                candleSeries.setData(candles);
+                
+                if (range && isFinite(range.from) && isFinite(range.to)) {
+                    chart.timeScale().setVisibleLogicalRange(range);
+                } else {
+                    chart.timeScale().fitContent();
                 }
-            ];
-
-            const list = document.getElementById('projections-list');
-            list.innerHTML = projections.map(p => `
-                <div class="projection-item ${p.type}">
-                    <div class="projection-label">${p.label}</div>
-                    <div class="projection-price">${p.price}</div>
-                    <div class="projection-reason">${p.reasons.join(' • ')}</div>
-                </div>
-            `).join('');
-        }
-
-        function calculateATR(data, period = 14) {
-            const trs = [];
-            for (let i = 1; i < data.length; i++) {
-                const tr1 = data[i].high - data[i].low;
-                const tr2 = Math.abs(data[i].high - data[i-1].close);
-                const tr3 = Math.abs(data[i].low - data[i-1].close);
-                trs.push(Math.max(tr1, tr2, tr3));
+                
+                updateUI(candles);
+                drawProjections(candles);
+                updateBias(candles);
+                
+                document.getElementById('status').textContent = '✓ Live';
+                
+            } catch (error) {
+                document.getElementById('status').textContent = '❌ ' + error.message;
             }
-            return trs.slice(-period).reduce((a, b) => a + b) / period;
         }
-
+        
+        function updateUI(candles) {
+            const last = candles[candles.length - 1];
+            const first = candles[0];
+            
+            document.getElementById('symbol-price').textContent = last.close.toFixed(5);
+            document.getElementById('bar-high').textContent = Math.max(...candles.map(c => c.high)).toFixed(5);
+            document.getElementById('bar-low').textContent = Math.min(...candles.map(c => c.l)).toFixed(5);
+            document.getElementById('bar-change').textContent = 
+                ((last.close - first.open) / first.open * 100).toFixed(2) + '%';
+            document.getElementById('bar-time').textContent = new Date().toLocaleTimeString();
+        }
+        
+        function calcATR(candles, n = 14) {
+            const trs = [];
+            for (let i = 1; i < candles.length; i++) {
+                const tr = Math.max(
+                    candles[i].high - candles[i].low,
+                    Math.abs(candles[i].high - candles[i-1].close),
+                    Math.abs(candles[i].low - candles[i-1].close)
+                );
+                trs.push(tr);
+            }
+            const slice = trs.slice(-n);
+            return slice.reduce((a, b) => a + b, 0) / n;
+        }
+        
+        function calcMA(candles, n = 20) {
+            const closes = candles.slice(-n).map(c => c.close);
+            return closes.reduce((a, b) => a + b, 0) / n;
+        }
+        
+        function drawProjections(candles) {
+            priceLines.forEach(pl => candleSeries.removePriceLine(pl));
+            priceLines = [];
+            
+            const last = candles[candles.length - 1];
+            const atr = calcATR(candles, 14);
+            const ma20 = calcMA(candles, 20);
+            
+            const pullback = Math.abs(last.close - ma20) < 0.5 * atr ? ma20 : last.close - 0.5 * atr;
+            const bullish = last.close + 1.5 * atr;
+            const bearish = last.close - 2.0 * atr;
+            
+            priceLines.push(candleSeries.createPriceLine({
+                price: pullback,
+                color: '#ffaa00',
+                lineWidth: 2,
+                lineStyle: 2,
+                title: 'Pullback'
+            }));
+            
+            priceLines.push(candleSeries.createPriceLine({
+                price: bullish,
+                color: '#00c851',
+                lineWidth: 2,
+                lineStyle: 0,
+                title: 'Bullish'
+            }));
+            
+            priceLines.push(candleSeries.createPriceLine({
+                price: bearish,
+                color: '#ff4444',
+                lineWidth: 2,
+                lineStyle: 0,
+                title: 'Bearish'
+            }));
+            
+            document.getElementById('projections-list').innerHTML = `
+                <div class="proj-item pullback">
+                    <div class="proj-label">Pullback Level</div>
+                    <div class="proj-price">${pullback.toFixed(5)}</div>
+                    <div class="proj-reason">Support for re-entry</div>
+                </div>
+                <div class="proj-item bullish">
+                    <div class="proj-label">Bullish Target</div>
+                    <div class="proj-price">${bullish.toFixed(5)}</div>
+                    <div class="proj-reason">Upside continuation • ATR +1.5</div>
+                </div>
+                <div class="proj-item bearish">
+                    <div class="proj-label">Bearish Target</div>
+                    <div class="proj-price">${bearish.toFixed(5)}</div>
+                    <div class="proj-reason">Downside if breaks • ATR -2.0</div>
+                </div>
+            `;
+        }
+        
+        function updateBias(candles) {
+            const last = candles[candles.length - 1];
+            const ma50 = calcMA(candles, 50);
+            const ma200 = calcMA(candles, 200);
+            
+            const htf = last.close > ma200 ? 'Bullish' : 'Bearish';
+            const itd = last.close > ma50 ? 'Bullish' : 'Bearish';
+            
+            document.getElementById('bias-htf').textContent = htf;
+            document.getElementById('bias-htf').className = 'bias-value ' + htf.toLowerCase();
+            
+            document.getElementById('bias-itd').textContent = itd;
+            document.getElementById('bias-itd').className = 'bias-value ' + itd.toLowerCase();
+        }
+        
         init();
     </script>
 </body>
 </html>
-
