@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>MRKT AI Terminal</title>
+    <meta name="theme-color" content="#0f1420">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MRKT AI">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%230f1420' width='180' height='180'/><text x='50%' y='50%' font-size='80' font-weight='bold' fill='%2300c851' text-anchor='middle' dominant-baseline='central'>M</text></svg>">
+    <style>
+        :root {
+            --bg: #0f1420;
+            --panel: #151b2b;
+            --text: #e6e9ef;
+            --muted: #9aa4b2;
+            --green: #00c851;
+            --red: #ff4444;
+            --yellow: #ffaa00;
+            --blue: #2396ff;
+        }
+        
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        html, body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            overflow: hidden;
+        }
+        
+        .topbar {
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            background: #0b1020;
+            border-bottom: 1px solid #1f2a44;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-shrink: 0;
+        }
+        
+        .brand {
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            font-size: 16px;
+        }
+        
+        .status {
+            font-size: 12px;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .live-dot {
+            color: #ff3b30;
+            font-size: 8px;
+            animation: pulse 1.4s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: 1fr auto auto;
+            height: calc(100vh - 56px);
+            gap: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .chart-wrap {
+            background: var(--panel);
+            border-bottom: 1px solid #1f2a44;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        
+        #chart {
+            flex: 1;
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .tf-switch {
+            position: absolute;
+            left: 12px;
+            top: 12px;
+            display: flex;
+            gap: 4px;
+            z-index: 10;
+        }
+        
+        .tf-switch button {
+            background: #11172a;
+            color: #cfd6e4;
+            border: 1px solid #273151;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        
+        .tf-switch button.active {
+            border-color: var(--blue);
+            color: #fff;
+            background: rgba(35, 150, 255, 0.1);
+        }
+        
+        .panels-wrap {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            padding: 8px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            max-height: 40vh;
+            border-top: 1px solid #1f2a44;
+        }
+        
+        .panel {
+            background: var(--panel);
+            border: 1px solid #1f2a44;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 12px;
+        }
+        
+        .panel h3 {
+            margin: 0 0 8px;
+            font-size: 12px;
+            color: #cfd6e4;
+        }
+        
+        .panel-content {
+            font-size: 11px;
+            line-height: 1.4;
+            color: var(--muted);
+        }
+        
+        .zone-item {
+            background: rgba(0, 200, 81, 0.1);
+            border-left: 3px solid var(--green);
+            padding: 6px;
+            margin: 4px 0;
+            border-radius: 2px;
+        }
+        
+        .zone-item.bearish {
+            background: rgba(255, 68, 68, 0.1);
+            border-left-color: var(--red);
+        }
+        
+        .zone-price {
+            font-weight: 600;
+            color: var(--text);
+        }
+        
+        .zone-conf {
+            color: var(--yellow);
+            font-size: 10px;
+        }
+        
+        .tp-item {
+            background: rgba(35, 150, 255, 0.1);
+            padding: 4px 6px;
+            margin: 3px 0;
+            border-radius: 2px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+        }
+        
+        .indicator-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 4px 0;
+            font-size: 11px;
+        }
+        
+        .ind-label {
+            color: var(--muted);
+        }
+        
+        .ind-value {
+            color: var(--text);
+            font-weight: 600;
+        }
+        
+        .bottombar {
+            height: 36px;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            border-top: 1px solid #1f2a44;
+            color: var(--muted);
+            font-size: 11px;
+            background: #0b1020;
+            flex-shrink: 0;
+        }
+        
+        @media (max-width: 600px) {
+            .panels-wrap {
+                grid-template-columns: 1fr;
+                max-height: 35vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">MRKT AI Terminal</div>
+        <div class="status">
+            <span class="live-dot">●</span>
+            <span>LIVE</span>
+            <span id="price-label" style="margin-left: 12px; color: #d5def0; font-weight: 600;"></span>
+        </div>
+    </header>
+
+    <main class="layout">
+        <section class="chart-wrap">
+            <canvas id="chart"></canvas>
+            <div class="tf-switch">
+                <button data-tf="1m">1m</button>
+                <button data-tf="5m">5m</button>
+                <button data-tf="15m">15m</button>
+                <button data-tf="1h">1h</button>
+                <button data-tf="4h">4h</button>
+                <button data-tf="Daily" class="active">Daily</button>
+            </div>
+        </section>
+
+        <div class="panels-wrap">
+            <div class="panel">
+                <h3>📊 Setup</h3>
+                <div class="panel-content">
+                    <div class="indicator-row">
+                        <span class="ind-label">Trend:</span>
+                        <span class="ind-value" id="setup-trend">Bullish</span>
+                    </div>
+                    <div class="indicator-row">
+                        <span class="ind-label">Strength:</span>
+                        <span class="ind-value" id="setup-strength">78%</span>
+                    </div>
+                    <div class="indicator-row">
+                        <span class="ind-label">Volatility:</span>
+                        <span class="ind-value" id="setup-vol">Medium</span>
+                    </div>
+                    <div class="indicator-row">
+                        <span class="ind-label">RSI:</span>
+                        <span class="ind-value" id="setup-rsi">58</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>🎯 Entry Zones</h3>
+                <div class="panel-content" id="zones-panel"></div>
+            </div>
+
+            <div class="panel">
+                <h3>📈 Indicators</h3>
+                <div class="panel-content">
+                    <div class="indicator-row">
+                        <span class="ind-label">MACD:</span>
+                        <span class="ind-value" id="ind-macd">Bullish</span>
+                    </div>
+                    <div class="indicator-row">
+                        <span class="ind-label">MA20:</span>
+                        <span class="ind-value" id="ind-ma20">Above</span>
+                    </div>
+                    <div class="indicator-row">
+                        <span class="ind-label">MA50:</span>
+                        <span class="ind-value" id="ind-ma50">Above</span>
+                    </div>
+                    <div class="indicator-row">
+                        <span class="ind-label">ADX:</span>
+                        <span class="ind-value" id="ind-adx">42</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>💰 TP / SL</h3>
+                <div class="panel-content" id="tpsl-panel"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bottombar">
+        Connected • Streaming • Next close: <span id="countdown">--:--</span>
+    </footer>
+
+    <script>
+        const canvas = document.getElementById('chart');
+        const ctx = canvas.getContext('2d', { alpha: false });
+
+        const DPR = Math.max(1, window.devicePixelRatio || 1);
+
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * DPR;
+            canvas.height = rect.height * DPR;
+            ctx.scale(DPR, DPR);
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const state = {
+            timeframe: 'Daily',
+            price: 1.0856,
+            bid: 1.08558,
+            ask: 1.08562,
+            candles: [],
+            forming: null,
+            maxCandles: 90,
+            tickMs: 1000,
+            lastTick: Date.now(),
+            atr: 0.0025,
+            trend: 'Bullish',
+            volatility: 'Medium',
+            rsi: 58,
+            macd: 'Bullish'
+        };
+
+        function seedCandles() {
+            const now = Date.now();
+            let p = state.price - 0.01;
+            for (let i = 60; i >= 1; i--) {
+                const t = now - i * 60_000;
+                const o = p;
+                const h = o + (Math.random() * 0.0009);
+                const l = o - (Math.random() * 0.0009);
+                const c = l + Math.random() * (h - l);
+                const v = Math.round(1200000 * (0.8 + Math.random() * 0.4));
+                state.candles.push({ t, o, h, l, c, v });
+                p = c;
+            }
+            state.price = state.candles[state.candles.length - 1].c;
+            startNewCandle();
+        }
+
+        function startNewCandle() {
+            const t = Date.now();
+            state.forming = { t, o: state.price, h: state.price, l: state.price, c: state.price, v: 0 };
+        }
+
+        function gaussian() {
+            let u = 0, v = 0;
+            while (u === 0) u = Math.random();
+            while (v === 0) v = Math.random();
+            return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+        }
+
+        function volScale() {
+            return state.volatility === 'High' ? 1.8 : state.volatility === 'Low' ? 0.6 : 1.0;
+        }
+
+        function drift() {
+            return state.trend === 'Bullish' ? 1 : state.trend === 'Bearish' ? -1 : 0;
+        }
+
+        function updateTick() {
+            const base = 0.00012 * volScale();
+            const move = gaussian() * base + drift() * base * 0.25;
+            state.price = Math.max(0, state.price + move);
+            state.bid = state.price - 0.0002;
+            state.ask = state.price + 0.0002;
+
+            const f = state.forming;
+            f.h = Math.max(f.h, state.price);
+            f.l = Math.min(f.l, state.price);
+            f.c = state.price;
+            f.v += Math.round(6000 + Math.random() * 5000);
+
+            const elapsed = Date.now() - f.t;
+            const closeMs = 60_000;
+            const remain = Math.max(0, closeMs - elapsed);
+            document.getElementById('countdown').textContent = `${String(Math.floor(remain / 1000)).padStart(2, '0')}.s`;
+
+            if (elapsed >= closeMs) {
+                state.candles.push(f);
+                if (state.candles.length > state.maxCandles) state.candles.shift();
+                startNewCandle();
+                state.atr = 0.9 * state.atr + 0.1 * (f.h - f.l);
+            }
+
+            document.getElementById('price-label').textContent = state.price.toFixed(4);
+            
+            updateAnalysis();
+            render();
+        }
+
+        function computeRSI(period = 14) {
+            const src = [...state.candles, state.forming].map(x => x.c);
+            if (src.length < period + 1) return 50;
+            let gains = 0, losses = 0;
+            for (let i = src.length - period; i < src.length; i++) {
+                const diff = src[i] - src[i - 1];
+                if (diff > 0) gains += diff;
+                else losses += -diff;
+            }
+            const rs = gains / Math.max(1e-9, losses);
+            return 100 - (100 / (1 + rs));
+        }
+
+        function updateAnalysis() {
+            state.rsi = Math.round(computeRSI());
+            document.getElementById('setup-rsi').textContent = state.rsi;
+            
+            // Random trend shift occasionally
+            if (Math.random() < 0.02) {
+                const trends = ['Bullish', 'Bearish', 'Neutral'];
+                state.trend = trends[Math.floor(Math.random() * trends.length)];
+                document.getElementById('setup-trend').textContent = state.trend;
+            }
+
+            // Update zones
+            const zones = [
+                { price: 1.0842, conf: 85, type: 'bullish' },
+                { price: 1.0835, conf: 72, type: 'bullish' }
+            ];
+            const zonesHTML = zones.map(z => 
+                `<div class="zone-item ${z.type === 'bearish' ? 'bearish' : ''}">
+                    <div class="zone-price">${z.price.toFixed(4)}</div>
+                    <div class="zone-conf">Confidence: ${z.conf}%</div>
+                </div>`
+            ).join('');
+            document.getElementById('zones-panel').innerHTML = zonesHTML;
+
+            // Update TP/SL
+            const entry = 1.0842;
+            const sl = 1.0825;
+            const tps = [
+                { price: 1.0875, rr: '1.9:1' },
+                { price: 1.0895, rr: '2.8:1' },
+                { price: 1.0915, rr: '3.8:1' }
+            ];
+            const tpsHTML = tps.map(tp =>
+                `<div class="tp-item">
+                    <span>${tp.price.toFixed(4)}</span>
+                    <span>${tp.rr}</span>
+                </div>`
+            ).join('');
+            document.getElementById('tpsl-panel').innerHTML = 
+                `<div style="margin-bottom: 6px;"><strong>SL:</strong> ${sl.toFixed(4)}</div>` + tpsHTML;
+        }
+
+        function render() {
+            const W = canvas.clientWidth;
+            const H = canvas.clientHeight;
+            
+            ctx.fillStyle = '#0f1420';
+            ctx.fillRect(0, 0, W, H);
+
+            // Grid
+            ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < 5; i++) {
+                const y = Math.round((H - 40) * i / 4) + 20;
+                ctx.beginPath();
+                ctx.moveTo(8, y);
+                ctx.lineTo(W - 8, y);
+                ctx.stroke();
+            }
+
+            // Price range
+            const candles = [...state.candles, state.forming];
+            if (candles.length === 0) return;
+
+            let minPrice = Math.min(...candles.map(c => c.l));
+            let maxPrice = Math.max(...candles.map(c => c.h));
+            const range = maxPrice - minPrice || 0.0001;
+            minPrice -= range * 0.05;
+            maxPrice += range * 0.05;
+
+            const chartHeight = H - 40;
+            const chartWidth = W - 16;
+            const candleWidth = Math.max(2, Math.floor(chartWidth / candles.length * 0.8));
+            const spacing = Math.ceil(chartWidth / candles.length);
+
+            // Draw candles
+            candles.forEach((candle, i) => {
+                const x = 8 + i * spacing + spacing / 2;
+                const openY = 20 + chartHeight * (1 - (candle.o - minPrice) / (maxPrice - minPrice));
+                const highY = 20 + chartHeight * (1 - (candle.h - minPrice) / (maxPrice - minPrice));
+                const lowY = 20 + chartHeight * (1 - (candle.l - minPrice) / (maxPrice - minPrice));
+                const closeY = 20 + chartHeight * (1 - (candle.c - minPrice) / (maxPrice - minPrice));
+
+                const color = candle.c >= candle.o ? '#00c851' : '#ff4444';
+
+                // Wick
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(x, highY);
+                ctx.lineTo(x, lowY);
+                ctx.stroke();
+
+                // Body
+                ctx.fillStyle = color;
+                const bodyTop = Math.min(openY, closeY);
+                const bodyHeight = Math.abs(closeY - openY) || 1;
+                ctx.fillRect(x - candleWidth / 2, bodyTop, candleWidth, bodyHeight);
+            });
+
+            // Current price line
+            const priceLine = 20 + chartHeight * (1 - (state.price - minPrice) / (maxPrice - minPrice));
+            ctx.strokeStyle = 'rgba(35, 150, 255, 0.5)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(8, priceLine);
+            ctx.lineTo(W - 8, priceLine);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        // Timeframe buttons
+        document.querySelectorAll('.tf-switch button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tf-switch button').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                state.timeframe = btn.dataset.tf;
+            });
+        });
+
+        seedCandles();
+        updateAnalysis();
+        render();
+
+        setInterval(updateTick, state.tickMs);
+    </script>
+</body>
+</html>
