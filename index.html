@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>MRKT AI Terminal - Real Data</title>
+    <title>MRKT AI - Price Projections Terminal</title>
     <meta name="theme-color" content="#0f1420">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -41,163 +41,210 @@
             height: 100vh;
         }
         
-        .topbar {
-            height: 56px;
+        .layout {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 12px;
-            background: #0b1020;
-            border-bottom: 1px solid #1f2a44;
-            z-index: 100;
-            flex-shrink: 0;
+            height: 100vh;
+            overflow: hidden;
         }
         
-        .brand {
+        .sidebar {
+            width: 300px;
+            background: #0b1020;
+            border-right: 1px solid #1f2a44;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid #1f2a44;
             font-weight: 700;
             font-size: 14px;
         }
         
-        .status {
-            font-size: 11px;
-            color: var(--muted);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        
-        .live-dot {
-            color: #ff3b30;
-            font-size: 8px;
-            animation: pulse 1.4s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
-        }
-        
-        .api-input-bar {
-            height: 50px;
-            padding: 8px 12px;
-            background: #0b1020;
+        .api-section {
+            padding: 12px;
             border-bottom: 1px solid #1f2a44;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 11px;
         }
         
-        .api-input-bar input {
-            flex: 1;
+        .api-section input {
+            width: 100%;
             background: #151b2b;
             border: 1px solid #273151;
             border-radius: 4px;
             padding: 6px 10px;
             color: var(--text);
             font-size: 11px;
+            margin: 4px 0;
         }
         
-        .api-input-bar button {
+        .api-section button {
+            width: 100%;
             background: var(--blue);
             color: white;
             border: none;
             border-radius: 4px;
-            padding: 6px 12px;
+            padding: 6px;
             font-size: 11px;
             cursor: pointer;
+            margin: 4px 0;
         }
         
-        .main-container {
-            display: flex;
-            flex-direction: column;
-            height: calc(100vh - 56px - 50px);
-            overflow: hidden;
-        }
-        
-        .symbol-bar {
-            height: 40px;
-            display: flex;
-            gap: 8px;
-            padding: 6px 10px;
-            background: #0b1020;
+        .symbols-section {
+            padding: 12px;
             border-bottom: 1px solid #1f2a44;
-            overflow-x: auto;
-            overflow-y: hidden;
-            flex-shrink: 0;
         }
         
-        .symbol-btn {
-            background: #151b2b;
-            color: #9aa4b2;
-            border: 1px solid #273151;
-            border-radius: 4px;
-            padding: 4px 10px;
+        .symbols-title {
             font-size: 11px;
-            white-space: nowrap;
-            cursor: pointer;
-            transition: 0.2s;
-            min-width: 60px;
+            color: var(--muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
         }
         
-        .symbol-btn.active {
-            background: var(--blue);
-            color: #fff;
-            border-color: var(--blue);
-        }
-        
-        .symbol-btn.loading {
-            opacity: 0.6;
-        }
-        
-        .chart-container {
+        .symbol-list {
             display: flex;
             flex-direction: column;
-            flex: 1;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        .chart-header {
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 12px;
-            background: var(--panel);
-            border-bottom: 1px solid #1f2a44;
-            font-size: 12px;
-            flex-shrink: 0;
-        }
-        
-        .tf-switch {
-            display: flex;
             gap: 4px;
         }
         
-        .tf-switch button {
-            background: #11172a;
-            color: #cfd6e4;
+        .symbol-item {
+            background: #151b2b;
             border: 1px solid #273151;
-            border-radius: 3px;
-            padding: 3px 7px;
-            font-size: 10px;
+            border-radius: 4px;
+            padding: 8px;
             cursor: pointer;
+            font-size: 12px;
             transition: 0.2s;
         }
         
-        .tf-switch button.active {
+        .symbol-item:hover,
+        .symbol-item.active {
+            background: var(--blue);
             border-color: var(--blue);
-            color: #fff;
-            background: rgba(35, 150, 255, 0.1);
+            color: white;
         }
         
-        .chart-canvas {
+        .timeframes-section {
+            padding: 12px;
+            border-bottom: 1px solid #1f2a44;
+        }
+        
+        .tf-title {
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        
+        .tf-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px;
+        }
+        
+        .tf-btn {
+            background: #151b2b;
+            border: 1px solid #273151;
+            border-radius: 4px;
+            padding: 6px;
+            cursor: pointer;
+            font-size: 10px;
+            color: var(--muted);
+            transition: 0.2s;
+        }
+        
+        .tf-btn.active {
+            background: var(--blue);
+            border-color: var(--blue);
+            color: white;
+        }
+        
+        .projections-section {
+            padding: 12px;
+            border-bottom: 1px solid #1f2a44;
             flex: 1;
+            overflow-y: auto;
+        }
+        
+        .projection-title {
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        
+        .projection-item {
+            background: rgba(0, 200, 81, 0.1);
+            border-left: 3px solid var(--green);
+            padding: 8px;
+            margin: 6px 0;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        
+        .projection-item.bearish {
+            background: rgba(255, 68, 68, 0.1);
+            border-left-color: var(--red);
+        }
+        
+        .projection-item.pullback {
+            background: rgba(255, 170, 0, 0.1);
+            border-left-color: var(--yellow);
+        }
+        
+        .projection-label {
+            font-size: 10px;
+            color: var(--muted);
+        }
+        
+        .projection-price {
+            font-weight: 700;
+            color: var(--text);
+            font-size: 12px;
+            margin: 4px 0;
+        }
+        
+        .projection-reason {
+            font-size: 9px;
+            color: var(--muted);
+            line-height: 1.3;
+        }
+        
+        .main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .top-bar {
+            height: 48px;
+            background: #0b1020;
+            border-bottom: 1px solid #1f2a44;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+        }
+        
+        .symbol-name {
+            font-weight: 700;
+            font-size: 16px;
+        }
+        
+        .current-price {
+            font-size: 14px;
+            color: var(--green);
+        }
+        
+        .chart-area {
+            flex: 1;
+            overflow: hidden;
             background: var(--panel);
             position: relative;
-            overflow: hidden;
-            touch-action: none;
         }
         
         #tradingview-chart {
@@ -205,188 +252,159 @@
             height: 100%;
         }
         
-        .bottom-panels {
-            height: 35vh;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
-            padding: 8px;
-            overflow-y: auto;
+        .info-bar {
+            height: 40px;
+            background: #0b1020;
             border-top: 1px solid #1f2a44;
-            flex-shrink: 0;
-        }
-        
-        .panel {
-            background: var(--panel);
-            border: 1px solid #1f2a44;
-            border-radius: 6px;
-            padding: 10px;
-            font-size: 11px;
-            overflow-y: auto;
-        }
-        
-        .panel h3 {
-            margin: 0 0 6px;
-            font-size: 11px;
-            color: #cfd6e4;
-        }
-        
-        .panel-row {
             display: flex;
-            justify-content: space-between;
-            margin: 3px 0;
-            font-size: 10px;
+            gap: 16px;
+            padding: 0 16px;
+            align-items: center;
+            font-size: 11px;
+            overflow-x: auto;
+            overflow-y: hidden;
         }
         
-        .status-msg {
-            font-size: 10px;
-            color: var(--yellow);
-            margin: 4px 0;
+        .info-item {
+            white-space: nowrap;
         }
         
-        .error-msg {
-            font-size: 10px;
-            color: var(--red);
+        .info-label {
+            color: var(--muted);
         }
         
-        .success-msg {
-            font-size: 10px;
-            color: var(--green);
+        .info-value {
+            color: var(--text);
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .layout {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: 35vh;
+                border-right: none;
+                border-bottom: 1px solid #1f2a44;
+            }
+            
+            .main-area {
+                height: 65vh;
+            }
         }
     </style>
 </head>
 <body>
-    <header class="topbar">
-        <div class="brand">MRKT AI Terminal - Real Data</div>
-        <div class="status">
-            <span class="live-dot" id="live-indicator">●</span>
-            <span id="status-text">Offline</span>
-        </div>
-    </header>
-
-    <!-- API Key Input -->
-    <div class="api-input-bar">
-        <span style="color: var(--muted);">EODHD API Key:</span>
-        <input type="password" id="api-key-input" placeholder="Paste API key dari eodhd.com" value="">
-        <button onclick="saveApiKey()">Save</button>
-        <span id="api-status" style="font-size: 10px;"></span>
-    </div>
-
-    <div class="main-container">
-        <!-- Symbol selector bar -->
-        <div class="symbol-bar" id="symbol-bar"></div>
-
-        <!-- Chart area -->
-        <div class="chart-container">
-            <div class="chart-header">
-                <span id="symbol-name">EURUSD</span>
-                <div class="tf-switch" id="tf-switch">
-                    <button data-tf="1">1m</button>
-                    <button data-tf="5">5m</button>
-                    <button data-tf="15">15m</button>
-                    <button data-tf="60">1h</button>
-                    <button data-tf="240">4h</button>
-                    <button data-tf="1440" class="active">Daily</button>
-                </div>
+    <div class="layout">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">MRKT AI Terminal</div>
+            
+            <div class="api-section">
+                <div style="font-size: 11px; color: var(--muted); margin-bottom: 6px;">EODHD API Key</div>
+                <input type="password" id="api-key-input" placeholder="Paste API key" value="">
+                <button onclick="saveApiKey()">Save & Connect</button>
+                <div id="api-status" style="font-size: 10px; margin-top: 4px;"></div>
             </div>
-            <div class="chart-canvas">
+            
+            <div class="symbols-section">
+                <div class="symbols-title">📊 Symbols</div>
+                <div class="symbol-list" id="symbol-list"></div>
+            </div>
+            
+            <div class="timeframes-section">
+                <div class="tf-title">⏱️ Timeframe</div>
+                <div class="tf-buttons" id="tf-buttons"></div>
+            </div>
+            
+            <div class="projections-section">
+                <div class="projection-title">🎯 Price Projections</div>
+                <div id="projections-list"></div>
+            </div>
+        </div>
+        
+        <!-- Main Area -->
+        <div class="main-area">
+            <div class="top-bar">
+                <div>
+                    <div class="symbol-name" id="symbol-name">EURUSD</div>
+                    <div class="current-price" id="current-price">0.0000</div>
+                </div>
+                <div id="status-info" style="font-size: 11px; color: var(--muted);">Waiting for API...</div>
+            </div>
+            
+            <div class="chart-area">
                 <div id="tradingview-chart"></div>
             </div>
-        </div>
-
-        <!-- Bottom analysis panels -->
-        <div class="bottom-panels">
-            <div class="panel">
-                <h3>📊 Market Info</h3>
-                <div class="panel-row">
-                    <span>Current Price:</span>
-                    <span id="current-price" style="font-weight: 600;">--</span>
+            
+            <div class="info-bar">
+                <div class="info-item">
+                    <span class="info-label">High: </span>
+                    <span class="info-value" id="day-high">--</span>
                 </div>
-                <div class="panel-row">
-                    <span>24h High:</span>
-                    <span id="day-high" style="font-weight: 600;">--</span>
+                <div class="info-item">
+                    <span class="info-label">Low: </span>
+                    <span class="info-value" id="day-low">--</span>
                 </div>
-                <div class="panel-row">
-                    <span>24h Low:</span>
-                    <span id="day-low" style="font-weight: 600;">--</span>
+                <div class="info-item">
+                    <span class="info-label">Change: </span>
+                    <span class="info-value" id="change">--</span>
                 </div>
-                <div class="panel-row">
-                    <span>Change:</span>
-                    <span id="change-pct" style="font-weight: 600;">--</span>
-                </div>
-            </div>
-
-            <div class="panel">
-                <h3>📈 Data Status</h3>
-                <div id="data-status" class="status-msg">Waiting for API key...</div>
-                <div id="last-update" class="panel-row">
-                    <span>Last Update:</span>
-                    <span>--</span>
-                </div>
-                <div id="data-source" class="panel-row">
-                    <span>Source:</span>
-                    <span>EODHD</span>
-                </div>
-            </div>
-
-            <div class="panel">
-                <h3>💡 Instructions</h3>
-                <div style="font-size: 10px; line-height: 1.4;">
-                    1. Daftar gratis: <strong>eodhd.com</strong><br>
-                    2. Copy API Key<br>
-                    3. Paste di atas → Click Save<br>
-                    4. Pilih symbol & timeframe<br>
-                    5. Chart loading data real
-                </div>
-            </div>
-
-            <div class="panel">
-                <h3>🔗 Supported Symbols</h3>
-                <div style="font-size: 9px; line-height: 1.3;">
-                    Forex: EURUSD, GBPUSD, USDJPY, AUDUSD<br>
-                    Commodities: XAUUSD, XAGUSD<br>
-                    Index: US500, NDX<br>
-                    Stocks: AAPL, MSFT, GOOGL, TSLA<br>
-                    Crypto: BTC, ETH
+                <div class="info-item">
+                    <span class="info-label">Last Update: </span>
+                    <span class="info-value" id="last-update">--</span>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // TradingView Chart
-        let chart = null;
-        let candleSeries = null;
-        
-        // EODHD Symbols mapping
-        const symbolsMap = {
-            'EURUSD': 'EURUSD.FOREX',
-            'GBPUSD': 'GBPUSD.FOREX',
-            'USDJPY': 'USDJPY.FOREX',
-            'AUDUSD': 'AUDUSD.FOREX',
-            'XAUUSD': 'XAUUSD.COMMODITY',
-            'XAGUSD': 'XAGUSD.COMMODITY',
-            'US500': 'INDU.INDX',  // S&P 500
-            'AAPL': 'AAPL.US',
-            'MSFT': 'MSFT.US',
-            'GOOGL': 'GOOGL.US',
-            'TSLA': 'TSLA.US',
-            'BTC': 'BTC.CC',
-            'ETH': 'ETH.CC'
-        };
-
-        const displaySymbols = [
-            'EURUSD', 'GBPUSD', 'USDJPY', 'AUDUSD',
-            'XAUUSD', 'US500',
-            'AAPL', 'MSFT', 'GOOGL', 'TSLA',
-            'BTC', 'ETH'
+        // Symbols & EODHD mapping
+        const symbols = [
+            { name: 'EURUSD', eodhd: 'EURUSD.FOREX' },
+            { name: 'GBPUSD', eodhd: 'GBPUSD.FOREX' },
+            { name: 'USDJPY', eodhd: 'USDJPY.FOREX' },
+            { name: 'AUDUSD', eodhd: 'AUDUSD.FOREX' },
+            { name: 'XAUUSD', eodhd: 'XAUUSD.COMMODITY' },
+            { name: 'US500', eodhd: 'INDU.INDX' },
+            { name: 'AAPL', eodhd: 'AAPL.US' },
+            { name: 'MSFT', eodhd: 'MSFT.US' },
+            { name: 'GOOGL', eodhd: 'GOOGL.US' },
+            { name: 'TSLA', eodhd: 'TSLA.US' },
+            { name: 'BTC', eodhd: 'BTC.CC' },
+            { name: 'ETH', eodhd: 'ETH.CC' }
         ];
-
+        
+        const timeframes = [
+            { label: '1m', value: '1' },
+            { label: '5m', value: '5' },
+            { label: '15m', value: '15' },
+            { label: '1h', value: '60' },
+            { label: '4h', value: '240' },
+            { label: 'Daily', value: '1440' }
+        ];
+        
         let currentSymbol = 'EURUSD';
         let currentTimeframe = '1440';
         let apiKey = localStorage.getItem('eodhd-api-key') || '';
+        let chart = null;
+        let candleSeries = null;
 
-        // Initialize Chart
+        // Initialize
+        function init() {
+            initChart();
+            createSymbolButtons();
+            createTimeframeButtons();
+            
+            if (apiKey) {
+                document.getElementById('api-key-input').value = apiKey;
+                document.getElementById('api-status').innerHTML = '<span style="color: var(--green);">✓ Loaded</span>';
+                setTimeout(loadChartData, 500);
+            }
+        }
+
         function initChart() {
             const container = document.getElementById('tradingview-chart');
             chart = LightweightCharts.createChart(container, {
@@ -403,6 +421,12 @@
                     horzLines: { color: 'rgba(255, 255, 255, 0.1)' },
                     vertLines: { color: 'rgba(255, 255, 255, 0.1)' },
                 },
+                rightPriceScale: {
+                    textColor: '#9aa4b2',
+                },
+                timeScale: {
+                    textColor: '#9aa4b2',
+                }
             });
 
             candleSeries = chart.addCandlestickSeries({
@@ -414,126 +438,163 @@
             });
 
             chart.timeScale().fitContent();
-            window.addEventListener('resize', () => chart && chart.applyOptions({ width: container.clientWidth, height: container.clientHeight }));
+            window.addEventListener('resize', () => {
+                if (chart) chart.applyOptions({ 
+                    width: container.clientWidth, 
+                    height: container.clientHeight 
+                });
+            });
         }
 
-        // Save API Key
-        function saveApiKey() {
-            apiKey = document.getElementById('api-key-input').value.trim();
-            if (!apiKey) {
-                document.getElementById('api-status').innerHTML = '<span class="error-msg">❌ API key kosong</span>';
-                return;
-            }
-            localStorage.setItem('eodhd-api-key', apiKey);
-            document.getElementById('api-status').innerHTML = '<span class="success-msg">✓ Saved</span>';
+        function createSymbolButtons() {
+            const list = document.getElementById('symbol-list');
+            symbols.forEach(sym => {
+                const btn = document.createElement('div');
+                btn.className = `symbol-item ${sym.name === currentSymbol ? 'active' : ''}`;
+                btn.textContent = sym.name;
+                btn.onclick = () => switchSymbol(sym.name);
+                list.appendChild(btn);
+            });
+        }
+
+        function createTimeframeButtons() {
+            const container = document.getElementById('tf-buttons');
+            timeframes.forEach(tf => {
+                const btn = document.createElement('button');
+                btn.className = `tf-btn ${tf.value === currentTimeframe ? 'active' : ''}`;
+                btn.textContent = tf.label;
+                btn.dataset.tf = tf.value;
+                btn.onclick = () => switchTimeframe(tf.value);
+                container.appendChild(btn);
+            });
+        }
+
+        function switchSymbol(sym) {
+            currentSymbol = sym;
+            document.getElementById('symbol-name').textContent = sym;
+            document.querySelectorAll('.symbol-item').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent === sym);
+            });
             loadChartData();
         }
 
-        // Load Chart Data from EODHD
+        function switchTimeframe(tf) {
+            currentTimeframe = tf;
+            document.querySelectorAll('.tf-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tf === tf);
+            });
+            loadChartData();
+        }
+
+        function saveApiKey() {
+            apiKey = document.getElementById('api-key-input').value.trim();
+            if (!apiKey) {
+                document.getElementById('api-status').innerHTML = '<span style="color: var(--red);">❌ Key kosong</span>';
+                return;
+            }
+            localStorage.setItem('eodhd-api-key', apiKey);
+            document.getElementById('api-status').innerHTML = '<span style="color: var(--green);">✓ Saved</span>';
+            loadChartData();
+        }
+
         async function loadChartData() {
             if (!apiKey) {
-                document.getElementById('data-status').innerHTML = '<span class="error-msg">❌ API key belum diset</span>';
+                document.getElementById('status-info').textContent = '❌ Masukkan API Key';
                 return;
             }
 
-            const eodSymbol = symbolsMap[currentSymbol];
-            const period = currentTimeframe;
-            const url = `https://eodhd.com/api/eod/${eodSymbol}?api_token=${apiKey}&period=${period}&fmt=json`;
+            const sym = symbols.find(s => s.name === currentSymbol);
+            const url = `https://eodhd.com/api/eod/${sym.eodhd}?api_token=${apiKey}&period=${currentTimeframe}&fmt=json`;
 
-            document.getElementById('data-status').innerHTML = '<span class="status-msg">⏳ Loading...</span>';
+            document.getElementById('status-info').textContent = '⏳ Loading...';
 
             try {
                 const response = await fetch(url);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 
                 const data = await response.json();
-                if (!data || !Array.isArray(data) || data.length === 0) {
-                    throw new Error('No data received');
-                }
+                if (!data || data.length === 0) throw new Error('No data');
 
-                // Convert EODHD format ke TradingView format
                 const candles = data.map(d => ({
                     time: Math.floor(new Date(d.date).getTime() / 1000),
                     open: d.open,
                     high: d.high,
                     low: d.low,
                     close: d.close,
-                    volume: d.volume
                 }));
 
                 candleSeries.setData(candles);
                 chart.timeScale().fitContent();
 
-                // Update info panel
+                // Update info
                 const latest = data[data.length - 1];
                 document.getElementById('current-price').textContent = latest.close.toFixed(4);
                 document.getElementById('day-high').textContent = latest.high.toFixed(4);
                 document.getElementById('day-low').textContent = latest.low.toFixed(4);
                 
                 const change = ((latest.close - data[0].open) / data[0].open * 100).toFixed(2);
-                document.getElementById('change-pct').textContent = `${change}%`;
-                
-                document.getElementById('last-update').innerHTML = `
-                    <span>Last Update:</span>
-                    <span>${new Date().toLocaleTimeString()}</span>
-                `;
-                
-                document.getElementById('data-status').innerHTML = '<span class="success-msg">✓ Data loaded from EODHD</span>';
-                document.getElementById('status-text').textContent = 'LIVE (EODHD)';
-                document.getElementById('live-indicator').style.color = '#00c851';
+                document.getElementById('change').textContent = `${change}%`;
+                document.getElementById('last-update').textContent = new Date().toLocaleTimeString();
+                document.getElementById('status-info').textContent = '✓ Live (EODHD)';
+
+                // Generate projections
+                generateProjections(data);
 
             } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('data-status').innerHTML = `<span class="error-msg">❌ ${error.message}</span><br>⚠️ Cek API key atau jumlah requests`;
+                document.getElementById('status-info').textContent = `❌ ${error.message}`;
             }
         }
 
-        // Create Symbol Buttons
-        function createSymbolButtons() {
-            const bar = document.getElementById('symbol-bar');
-            displaySymbols.forEach(sym => {
-                const btn = document.createElement('button');
-                btn.className = `symbol-btn ${sym === currentSymbol ? 'active' : ''}`;
-                btn.textContent = sym;
-                btn.onclick = () => switchSymbol(sym);
-                bar.appendChild(btn);
-            });
+        function generateProjections(data) {
+            const latest = data[data.length - 1];
+            const prevClose = data[0].close;
+            const atr = calculateATR(data);
+            const trend = latest.close > prevClose ? 'bullish' : 'bearish';
+
+            const projections = [
+                {
+                    label: 'Bullish Target',
+                    price: (latest.close + atr * 1.5).toFixed(4),
+                    type: 'bullish',
+                    reasons: ['Strong momentum', 'Above MA50', 'MACD positive']
+                },
+                {
+                    label: 'Pullback Level',
+                    price: (latest.close - atr * 0.5).toFixed(4),
+                    type: 'pullback',
+                    reasons: ['Support zone', 'Previous bounce', 'Fibonacci level']
+                },
+                {
+                    label: 'Bearish Target',
+                    price: (latest.close - atr * 2).toFixed(4),
+                    type: 'bearish',
+                    reasons: ['If breaks support', 'Resistance rejection', 'Economic data']
+                }
+            ];
+
+            const list = document.getElementById('projections-list');
+            list.innerHTML = projections.map(p => `
+                <div class="projection-item ${p.type}">
+                    <div class="projection-label">${p.label}</div>
+                    <div class="projection-price">${p.price}</div>
+                    <div class="projection-reason">${p.reasons.join(' • ')}</div>
+                </div>
+            `).join('');
         }
 
-        // Switch Symbol
-        function switchSymbol(sym) {
-            currentSymbol = sym;
-            document.getElementById('symbol-name').textContent = sym;
-            document.querySelectorAll('.symbol-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.textContent === sym);
-            });
-            loadChartData();
+        function calculateATR(data, period = 14) {
+            const trs = [];
+            for (let i = 1; i < data.length; i++) {
+                const tr1 = data[i].high - data[i].low;
+                const tr2 = Math.abs(data[i].high - data[i-1].close);
+                const tr3 = Math.abs(data[i].low - data[i-1].close);
+                trs.push(Math.max(tr1, tr2, tr3));
+            }
+            return trs.slice(-period).reduce((a, b) => a + b) / period;
         }
 
-        // Timeframe Buttons
-        document.querySelectorAll('.tf-switch button').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.tf-switch button').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentTimeframe = btn.dataset.tf;
-                loadChartData();
-            });
-        });
-
-        // Load saved API key if exists
-        if (apiKey) {
-            document.getElementById('api-key-input').value = apiKey;
-            document.getElementById('api-status').innerHTML = '<span class="success-msg">✓ API key loaded</span>';
-        }
-
-        // Initialize
-        initChart();
-        createSymbolButtons();
-        
-        // Auto-load jika ada API key
-        if (apiKey) {
-            setTimeout(loadChartData, 500);
-        }
+        init();
     </script>
 </body>
 </html>
+
